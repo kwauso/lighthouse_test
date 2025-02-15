@@ -3,7 +3,8 @@ import { NextResponse } from 'next/server'
 export async function POST(request: Request) {
   try {
     const formData = await request.formData()
-    const file = formData.get('file') as File
+    const file = formData.get('file') as Blob
+    
     if (!file) {
       return NextResponse.json(
         { error: 'ファイルが見つかりません' },
@@ -11,15 +12,16 @@ export async function POST(request: Request) {
       )
     }
 
-    // ここでファイルの処理を行います
-    // 例：ファイル名とサイズを確認
-    console.log('ファイル名:', file.name)
-    console.log('ファイルサイズ:', file.size)
-
-    // 実際のアプリケーションでは、ここでファイルを保存したり
-    // クラウドストレージにアップロードしたりします
-
-    return NextResponse.json({ success: true })
+    // 直接Bufferに変換
+    const buffer = Buffer.from(await file.arrayBuffer())
+    
+    console.log('バッファーサイズ:', buffer.length)
+    // ここでbufferを使用してファイルの処理が可能です
+    
+    return NextResponse.json({ 
+      success: true,
+      size: buffer.length
+    })
   } catch (error) {
     console.error('エラー:', error)
     return NextResponse.json(
